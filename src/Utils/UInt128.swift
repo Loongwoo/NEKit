@@ -21,9 +21,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
 // MARK: Error Type
-
 /// An `ErrorType` for `UInt128` data types. It includes cases
 /// for errors that can occur during string
 /// conversion.
@@ -33,7 +31,6 @@ public enum UInt128Errors : Error {
 }
 
 // MARK: - Data Type
-
 /// A 128-bit unsigned integer value type.
 /// Storage is based upon a tuple of 2, 64-bit, unsigned integers.
 public struct UInt128 {
@@ -42,7 +39,7 @@ public struct UInt128 {
     /// Internal value is presented as a tuple of 2 64-bit
     /// unsigned integers.
     internal var value: (upperBits: UInt64, lowerBits: UInt64)
-    
+
     /// Counts up the significant bits in stored data.
     public var significantBits: UInt128 {
         var significantBits: UInt128 = 0
@@ -104,7 +101,6 @@ public struct UInt128 {
 }
 
 // MARK: - FixedWidthInteger Conformance
-
 extension UInt128 : FixedWidthInteger {
     // MARK: Instance Properties
     
@@ -146,7 +142,7 @@ extension UInt128 : FixedWidthInteger {
             return self
         #endif
     }
-    
+
     /// Returns the little-endian representation of the integer, changing the byte order if necessary.
     public var littleEndian: UInt128 {
         #if arch(i386) || arch(x86_64) || arch(arm) || arch(arm64)
@@ -155,7 +151,7 @@ extension UInt128 : FixedWidthInteger {
             return self.byteSwapped
         #endif
     }
-    
+
     /// Returns the current integer with the byte order swapped.
     public var byteSwapped: UInt128 {
         return UInt128(upperBits: self.value.lowerBits.byteSwapped, lowerBits: self.value.upperBits.byteSwapped)
@@ -216,7 +212,7 @@ extension UInt128 : FixedWidthInteger {
         if lowerOverflow {
             (upperBits, resultOverflow) = upperBits.subtractingReportingOverflow(1)
         }
-        
+
         return (partialValue: UInt128(upperBits: upperBits, lowerBits: lowerBits),
                 overflow: upperOverflow || resultOverflow)
     }
@@ -431,38 +427,36 @@ extension UInt128 : FixedWidthInteger {
 }
 
 // MARK: - BinaryInteger Conformance
-
 extension UInt128 : BinaryInteger {
     // MARK: Instance Properties
     
     public static var bitWidth : Int { return 128 }
-    
-    
+
+
     // MARK: Instance Methods
-    
     public var words: [UInt] {
         guard self != UInt128.min else {
             return []
         }
-        
+
         var words: [UInt] = []
-        
+
         for currentWord in 0 ... self.bitWidth / UInt.bitWidth {
             let shiftAmount: UInt64 = UInt64(UInt.bitWidth) * UInt64(currentWord)
             let mask = UInt64(UInt.max)
             var shifted = self
-            
+
             if shiftAmount > 0 {
                 shifted &>>= UInt128(upperBits: 0, lowerBits: shiftAmount)
             }
-            
+
             let masked: UInt128 = shifted & UInt128(upperBits: 0, lowerBits: mask)
-            
+
             words.append(UInt(masked.value.lowerBits))
         }
         return words
     }
-    
+
     public var trailingZeroBitCount: Int {
         let mask: UInt128 = 1
         var bitsToWalk = self
@@ -494,7 +488,7 @@ extension UInt128 : BinaryInteger {
     public init<T : BinaryFloatingPoint>(_ source: T) {
         self.init(UInt64(source))
     }
-    
+
     // MARK: Type Methods
     
     public static func /(_ lhs: UInt128, _ rhs: UInt128) -> UInt128 {
@@ -591,11 +585,9 @@ extension UInt128 : BinaryInteger {
 }
 
 // MARK: - UnsignedInteger Conformance
-
 extension UInt128 : UnsignedInteger {}
 
 // MARK: - Hashable Conformance
-
 extension UInt128 : Hashable {
     public var hashValue: Int {
         return self.value.lowerBits.hashValue ^ self.value.upperBits.hashValue
@@ -603,7 +595,6 @@ extension UInt128 : Hashable {
 }
 
 // MARK: - Numeric Conformance
-
 extension UInt128 : Numeric {
     public static func +(_ lhs: UInt128, _ rhs: UInt128) -> UInt128 {
         precondition(~lhs >= rhs, "Addition overflow!")
@@ -632,7 +623,6 @@ extension UInt128 : Numeric {
 }
 
 // MARK: - Equatable Conformance
-
 extension UInt128 : Equatable {
     /// Checks if the `lhs` is equal to the `rhs`.
     public static func ==(lhs: UInt128, rhs: UInt128) -> Bool {
@@ -644,7 +634,6 @@ extension UInt128 : Equatable {
 }
 
 // MARK: - ExpressibleByIntegerLiteral Conformance
-
 extension UInt128 : ExpressibleByIntegerLiteral {
     public init(integerLiteral value: IntegerLiteralType) {
         self.init(upperBits: 0, lowerBits: UInt64(value))
@@ -652,7 +641,6 @@ extension UInt128 : ExpressibleByIntegerLiteral {
 }
 
 // MARK: - CustomStringConvertible Conformance
-
 extension UInt128 : CustomStringConvertible {
     // MARK: Instance Properties
     
@@ -695,7 +683,6 @@ extension UInt128 : CustomStringConvertible {
 }
 
 // MARK: - CustomDebugStringConvertible Conformance
-
 extension UInt128 : CustomDebugStringConvertible {
     public var debugDescription: String {
         return self.description
@@ -703,7 +690,6 @@ extension UInt128 : CustomDebugStringConvertible {
 }
 
 // MARK: - Comparable Conformance
-
 extension UInt128 : Comparable {
     public static func <(lhs: UInt128, rhs: UInt128) -> Bool {
         if lhs.value.upperBits < rhs.value.upperBits {
@@ -716,7 +702,6 @@ extension UInt128 : Comparable {
 }
 
 // MARK: - ExpressibleByStringLiteral Conformance
-
 extension UInt128 : ExpressibleByStringLiteral {
     // MARK: Initializers
     
@@ -750,7 +735,6 @@ extension UInt128 : ExpressibleByStringLiteral {
 }
 
 // MARK: - Deprecated API
-
 extension UInt128 {
     /// Initialize a UInt128 value from a string.
     ///
@@ -765,7 +749,6 @@ extension UInt128 {
 }
 
 // MARK: - BinaryFloatingPoint Interworking
-
 extension BinaryFloatingPoint {
     public init(_ value: UInt128) {
         precondition(value.value.upperBits == 0, "Value is too large to fit into a BinaryFloatingPoint until a 128bit BinaryFloatingPoint type is defined.")
@@ -781,7 +764,6 @@ extension BinaryFloatingPoint {
 }
 
 // MARK: - String Interworking
-
 extension String {
     /// Creates a string representing the given value in base 10, or some other
     /// specified base.
